@@ -1,0 +1,10 @@
+{
+  "name": "harness-demo-app-playwright-smoke",
+  "private": true,
+  "scripts": {
+    "test:qa:blue": "playwright test --config=playwright.config.js"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.44.1"
+  }
+}

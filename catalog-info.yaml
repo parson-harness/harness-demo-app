@@ -1,0 +1,61 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: harness-pov-app
+  description: Demo application for Harness POV demonstrations
+  annotations:
+    harness.io/project-url: https://app.harness.io/ng/account/ACCOUNT_ID/home/orgs/ORG_ID/projects/PROJECT_ID
+    harness.io/ci-pipelineIds: harness-pov-app-ci
+    harness.io/cd-serviceId: harness-pov-app
+    github.com/project-slug: harness/harness-pov-app
+    backstage.io/techdocs-ref: dir:.
+  tags:
+    - java
+    - spring-boot
+    - demo
+    - pov
+  links:
+    - url: https://harness.io
+      title: Harness Platform
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: platform-team
+  system: harness-pov
+  providesApis:
+    - harness-pov-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: harness-pov-api
+  description: REST API for Harness POV Demo App
+spec:
+  type: openapi
+  lifecycle: production
+  owner: platform-team
+  definition: |
+    openapi: 3.0.0
+    info:
+      title: Harness POV Demo API
+      version: 1.0.0
+    paths:
+      /api/info:
+        get:
+          summary: Get application information
+          responses:
+            '200':
+              description: Application info
+      /api/health:
+        get:
+          summary: Health check
+          responses:
+            '200':
+              description: Health status
+      /api/version:
+        get:
+          summary: Get version info
+          responses:
+            '200':
+              description: Version details

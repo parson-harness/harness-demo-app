@@ -1,0 +1,55 @@
+service:
+  name: Toddfour Demo App
+  identifier: toddfour_demo_app
+  description: Demo application for toddfour (EKS)
+  tags:
+    tofu: ""
+    toddfour: ""
+    eks: ""
+    workspace-id: toddfour_pov
+    workspace-template-id: POV_Provisioner
+  serviceDefinition:
+    type: Kubernetes
+    spec:
+      artifacts:
+        primary:
+          primaryArtifactRef: primary
+          sources:
+            - identifier: primary
+              type: Har
+              spec:
+                registryRef: har-docker-shared
+                type: docker
+                spec:
+                  tag: "1.0.<+pipeline.sequenceId>"
+                  digest: ""
+                  imagePath: toddfourdemoapp
+      manifests:
+        - manifest:
+            identifier: k8s_manifests
+            type: K8sManifest
+            spec:
+              store:
+                type: HarnessCode
+                spec:
+                  gitFetchType: Branch
+                  paths:
+                    - k8s/
+                  repoName: harness-demo-app
+                  branch: main
+              valuesPaths:
+                - k8s/values.yaml
+              skipResourceVersioning: false
+              enableDeclarativeRollback: false
+      variables:
+        - name: ingressHost
+          type: String
+          value: toddfour.harness-demo.dev
+        - name: ingressStageHost
+          type: String
+          value: toddfour-stage.harness-demo.dev
+        - name: certArn
+          type: String
+          value: arn:aws:acm:us-east-1:759984737373:certificate/9c90d4f8-208d-46cd-bdc1-bc13f1759c05
+  orgIdentifier: sandbox
+  projectIdentifier: parson

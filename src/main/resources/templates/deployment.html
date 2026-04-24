@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${config.appName} + ' - Deployment'">My Application - Deployment</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'harness-dark': '#0D0D12',
+                        'harness-darker': '#08080B',
+                        'harness-blue': '#0278D5',
+                        'harness-cyan': '#00ADE4',
+                        'harness-purple': '#7B61FF',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #00D4FF 0%, #7B61FF 50%, #FF6B9D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .variant-badge { background-color: var(--variant-color); }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .pulse { animation: pulse 2s infinite; }
+    </style>
+</head>
+<body class="bg-harness-dark min-h-screen text-white" th:style="'--variant-color: ' + ${config.variantColor}">
+    
+    <!-- Deployment Status Bar -->
+    <div class="variant-badge py-1.5 px-4 text-center text-sm font-medium">
+        <span class="inline-flex items-center space-x-3">
+            <span class="flex items-center">
+                <span class="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                <span th:text="${config.effectiveVariant.toUpperCase()}">STABLE</span>
+            </span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.displayVersion}">1.0.0</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.displayDeploymentTarget}">Amazon EKS</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.displayDeploymentStrategy}">Canary</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.namespace}">harness-demo</span>
+        </span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-harness-darker/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <img th:if="${config.customerLogo != ''}" th:src="${config.customerLogo}" alt="Logo" class="h-8">
+                    <img th:if="${config.customerLogo == ''}" src="/images/harness-logo.png" alt="Harness" class="h-8">
+                    <div class="hidden md:block text-left">
+                        <div class="text-sm font-semibold text-white" th:text="${config.appName}">Harness Demo Application</div>
+                        <div class="text-xs text-gray-400" th:text="${config.displayCustomerName}">Harness Customer</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-8">
+                    <a href="/" class="text-gray-400 hover:text-white transition">Home</a>
+                    <a href="/services" class="text-gray-400 hover:text-white transition">Services</a>
+                    <a href="/deployment" class="text-white font-medium hover:text-harness-cyan transition">Deployment</a>
+                    <a href="/resilience" class="text-gray-400 hover:text-white transition">Resilience</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="py-16 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h1 class="text-4xl font-bold mb-4">
+                <span class="gradient-text">Deployment Information</span>
+            </h1>
+            <p class="text-gray-400">Real-time deployment details for <span th:text="${config.displayCustomerName}">Harness Customer</span> on <span th:text="${config.displayDeploymentTarget}">Amazon EKS</span></p>
+        </div>
+    </section>
+
+    <!-- Large Variant Display -->
+    <section class="py-12">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <div class="inline-block rounded-2xl p-10"
+                     th:classappend="${config.effectiveVariant == 'canary'} ? 'bg-yellow-500/20 border-4 border-yellow-400' : (${config.effectiveVariant == 'stable'} ? 'bg-purple-500/20 border-4 border-purple-400' : 'bg-white/5 border-2 border-white/20')">
+                    <div class="text-gray-400 uppercase tracking-widest mb-2 text-sm">You Are Hitting</div>
+                    <div class="text-6xl font-black mb-4 uppercase"
+                         th:classappend="${config.effectiveVariant == 'canary'} ? 'text-yellow-400' : (${config.effectiveVariant == 'stable'} ? 'text-purple-400' : 'gradient-text')"
+                         th:text="${config.effectiveVariant}">STABLE</div>
+                    <div class="text-lg text-white/80 mb-4" th:text="${config.deploymentNarrative}">You are viewing the live production release</div>
+                    <div class="flex justify-center items-center space-x-4">
+                        <span class="variant-badge px-4 py-2 rounded-full font-semibold" th:text="${config.displayVersion}">1.0.0</span>
+                        <span class="px-4 py-2 bg-white/10 rounded-full" th:text="${config.environment}">production</span>
+                        <span class="px-4 py-2 bg-white/10 rounded-full" th:text="${config.displayDeploymentTarget}">Amazon EKS</span>
+                        <span class="px-4 py-2 bg-white/10 rounded-full" th:text="${config.displayDeploymentStrategy}">Canary</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4 mb-12">
+                <a th:if="${config.publicUrl != null and !config.publicUrl.isEmpty()}" th:href="${config.publicUrl}" target="_blank" rel="noopener noreferrer" class="bg-white/5 rounded-xl p-5 border border-white/10 hover:border-harness-cyan/50 transition block">
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Production URL</div>
+                    <div class="font-mono text-sm break-all" th:text="${config.publicUrl}">https://toddasg-asg.harness-demo.dev</div>
+                </a>
+                <a th:if="${config.stageUrl != null and !config.stageUrl.isEmpty() and config.effectiveDeploymentStrategy == 'blue-green'}" th:href="${config.stageUrl}" target="_blank" rel="noopener noreferrer" class="bg-white/5 rounded-xl p-5 border border-white/10 hover:border-harness-cyan/50 transition block">
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Stage URL</div>
+                    <div class="font-mono text-sm break-all" th:text="${config.stageUrl}">http://toddasg-asg.harness-demo.dev:8080</div>
+                </a>
+            </div>
+
+            <div class="grid md:grid-cols-4 gap-4 mb-12">
+                <div class="bg-white/5 rounded-xl p-5 border border-white/10 text-center">
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Customer</div>
+                    <div class="font-semibold" th:text="${config.displayCustomerName}">Harness Customer</div>
+                </div>
+                <div class="bg-white/5 rounded-xl p-5 border border-white/10 text-center">
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Build</div>
+                    <div class="font-mono font-semibold" th:text="${config.displayBuildId}">n/a</div>
+                </div>
+                <div class="bg-white/5 rounded-xl p-5 border border-white/10 text-center">
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Target</div>
+                    <div class="font-semibold" th:text="${config.displayDeploymentTarget}">Amazon EKS</div>
+                </div>
+                <div class="bg-white/5 rounded-xl p-5 border border-white/10 text-center">
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Strategy</div>
+                    <div class="font-semibold" th:text="${config.displayDeploymentStrategy}">Canary</div>
+                </div>
+            </div>
+
+            <!-- Deployment Strategies -->
+            <h2 class="text-2xl font-bold mb-6 text-center">Deployment Strategies</h2>
+            <div class="grid md:grid-cols-4 gap-6 mb-12">
+                <div class="bg-blue-500/10 border-2 border-blue-500/50 rounded-xl p-5 text-center transition-all"
+                     th:classappend="${config.effectiveVariant == 'blue'} ? 'ring-4 ring-blue-400 bg-blue-500/20' : ''">
+                    <div class="text-3xl mb-2">🔵</div>
+                    <h3 class="text-lg font-bold text-blue-400 mb-1">Blue</h3>
+                    <p class="text-gray-400 text-xs" th:text="${config.effectiveVariant == 'blue'} ? 'Active release' : 'Inactive blue pod set'">Active release</p>
+                    <code class="text-xs text-blue-300 mt-1 block">blue</code>
+                </div>
+                <div class="bg-green-500/10 border-2 border-green-500/50 rounded-xl p-5 text-center transition-all"
+                     th:classappend="${config.effectiveVariant == 'green'} ? 'ring-4 ring-green-400 bg-green-500/20' : ''">
+                    <div class="text-3xl mb-2">🟢</div>
+                    <h3 class="text-lg font-bold text-green-400 mb-1">Green</h3>
+                    <p class="text-gray-400 text-xs" th:text="${config.effectiveVariant == 'green'} ? 'Active release' : 'Inactive green pod set'">Active release</p>
+                    <code class="text-xs text-green-300 mt-1 block">green</code>
+                </div>
+                <div class="bg-purple-500/10 border-2 border-purple-500/50 rounded-xl p-5 text-center transition-all"
+                     th:classappend="${config.effectiveVariant == 'stable'} ? 'ring-4 ring-purple-400 bg-purple-500/20' : ''">
+                    <div class="text-3xl mb-2">🟣</div>
+                    <h3 class="text-lg font-bold text-purple-400 mb-1">Stable</h3>
+                    <p class="text-gray-400 text-xs" th:text="${config.effectiveVariant == 'stable'} ? 'Active stable track' : 'Stable production track'">Stable production track</p>
+                    <code class="text-xs text-purple-300 mt-1 block">stable</code>
+                </div>
+                <div class="bg-yellow-500/10 border-2 border-yellow-500/50 rounded-xl p-5 text-center transition-all"
+                     th:classappend="${config.effectiveVariant == 'canary'} ? 'ring-4 ring-yellow-400 bg-yellow-500/20' : ''">
+                    <img src="/images/harness-canary.png" alt="Canary" class="h-12 w-auto mx-auto mb-2">
+                    <h3 class="text-lg font-bold text-yellow-400 mb-1">Canary</h3>
+                    <p class="text-gray-400 text-xs" th:text="${config.effectiveVariant == 'canary'} ? 'Active canary traffic' : 'Canary candidate track'">Canary candidate track</p>
+                    <code class="text-xs text-yellow-300 mt-1 block">canary</code>
+                </div>
+            </div>
+
+            <!-- Deployment Targets -->
+            <h2 class="text-2xl font-bold mb-6 text-center">Supported Deployment Targets</h2>
+            <div class="grid md:grid-cols-4 gap-4 mb-12">
+                <div class="bg-white/5 border border-white/10 rounded-xl p-5 text-center"
+                     th:classappend="${config.deploymentTarget == 'kubernetes' or config.deploymentTarget == 'eks'} ? 'ring-1 ring-harness-cyan' : ''">
+                    <i class="fab fa-aws text-3xl text-orange-400 mb-2"></i>
+                    <div class="font-semibold">EKS</div>
+                    <div class="text-xs text-gray-500">Kubernetes</div>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-xl p-5 text-center"
+                     th:classappend="${config.deploymentTarget == 'ecs'} ? 'ring-1 ring-harness-cyan' : ''">
+                    <i class="fab fa-aws text-3xl text-orange-400 mb-2"></i>
+                    <div class="font-semibold">ECS</div>
+                    <div class="text-xs text-gray-500">Containers</div>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-xl p-5 text-center"
+                     th:classappend="${config.deploymentTarget == 'lambda'} ? 'ring-1 ring-harness-cyan' : ''">
+                    <i class="fab fa-aws text-3xl text-orange-400 mb-2"></i>
+                    <div class="font-semibold">Lambda</div>
+                    <div class="text-xs text-gray-500">Serverless</div>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-xl p-5 text-center"
+                     th:classappend="${config.deploymentTarget == 'asg'} ? 'ring-1 ring-harness-cyan' : ''">
+                    <i class="fab fa-aws text-3xl text-orange-400 mb-2"></i>
+                    <div class="font-semibold">ASG</div>
+                    <div class="text-xs text-gray-500">Auto Scaling</div>
+                </div>
+            </div>
+
+            <!-- Instance Details -->
+            <div class="bg-white/5 rounded-xl p-6 border border-white/10 mb-8">
+                <h2 class="text-xl font-semibold mb-6 flex items-center">
+                    <i class="fas fa-info-circle text-harness-cyan mr-3"></i>
+                    Instance Details
+                </h2>
+                <div class="grid md:grid-cols-2 gap-x-12 gap-y-4">
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Hostname</span>
+                        <span class="font-mono" th:text="${hostname}">localhost</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Version</span>
+                        <span class="font-mono" th:text="${config.displayVersion}">1.0.0</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Pod/Instance</span>
+                        <span class="font-mono" th:text="${config.podName}">local</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Environment</span>
+                        <span class="font-mono" th:text="${config.environment}">production</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Namespace</span>
+                        <span class="font-mono" th:text="${config.namespace}">default</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Variant</span>
+                        <span class="font-mono font-bold" th:text="${config.effectiveVariant}" th:style="'color: ' + ${config.variantColor}">stable</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Region</span>
+                        <span class="font-mono" th:text="${config.region}">us-east-1</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Target</span>
+                        <span class="font-mono" th:text="${config.displayDeploymentTarget}">Amazon EKS</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Strategy</span>
+                        <span class="font-mono" th:text="${config.displayDeploymentStrategy}">Blue Green</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Customer</span>
+                        <span class="font-mono" th:text="${config.displayCustomerName}">Harness Customer</span>
+                    </div>
+                    <div class="flex justify-between py-3 border-b border-white/10">
+                        <span class="text-gray-400">Build ID</span>
+                        <span class="font-mono" th:text="${config.displayBuildId}">n/a</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Environment Variables -->
+            <div class="bg-black/50 rounded-xl p-6 border border-white/10">
+                <h3 class="text-lg font-semibold mb-4 flex items-center">
+                    <i class="fas fa-terminal text-green-400 mr-3"></i>
+                    Configuration
+                </h3>
+                <pre class="text-green-400 text-sm overflow-x-auto"><code># Application
+APP_NAME="<span th:text="${config.appName}">My Application</span>"
+CUSTOMER_NAME="<span th:text="${config.displayCustomerName}">Harness Customer</span>"
+APP_VERSION=<span th:text="${config.displayVersion}">1.0.0</span>
+BUILD_ID=<span th:text="${config.displayBuildId}">n/a</span>
+APP_ENVIRONMENT=<span th:text="${config.environment}">production</span>
+
+# Deployment
+DEPLOYMENT_VARIANT=<span th:text="${config.effectiveVariant}">blue</span>
+VARIANT_COLOR=<span th:text="${config.variantColor}">#3B82F6</span>
+DEPLOYMENT_TARGET=<span th:text="${config.deploymentTarget}">kubernetes</span>
+DEPLOYMENT_STRATEGY=<span th:text="${config.effectiveDeploymentStrategy}">blue-green</span>
+PUBLIC_URL=<span th:text="${config.publicUrl}">https://toddasg-asg.harness-demo.dev</span>
+STAGE_URL=<span th:text="${config.stageUrl}">http://toddasg-asg.harness-demo.dev:8080</span>
+
+# Branding
+CUSTOMER_LOGO="<span th:text="${config.customerLogo}">https://example.com/logo.png</span>"
+
+# Infrastructure
+NAMESPACE=<span th:text="${config.namespace}">production</span>
+REGION=<span th:text="${config.region}">us-east-1</span></code></pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6 text-center text-gray-500 text-sm">
+            <span th:text="${config.displayVersion}">1.0.0</span> &middot;
+            <span th:text="${config.environment}">production</span>
+        </div>
+    </footer>
+</body>
+</html>

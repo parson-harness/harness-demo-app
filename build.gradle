@@ -1,0 +1,89 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.2.3'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'jacoco'
+}
+
+group = 'io.harness.demo'
+version = '1.0.0'
+
+java {
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+    
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    if (System.getProperty('HARNESS_JAVA_AGENT')) {
+        jvmArgs += [System.getProperty('HARNESS_JAVA_AGENT')]
+    }
+    // Enable parallel test execution for faster builds
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+    filter {
+        setFailOnNoMatchingTests(false)
+    }
+    
+    // JUnit XML reports for Harness Test Intelligence
+    reports {
+        junitXml.required = true
+        html.required = true
+    }
+    
+    // JaCoCo coverage
+    finalizedBy jacocoTestReport
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+// Build Intelligence benefits from incremental compilation
+tasks.withType(JavaCompile) {
+    options.incremental = true
+}
+
+// Custom task to show build info
+tasks.register('buildInfo') {
+    doLast {
+        println "=== HARNESS CI BUILD INTELLIGENCE ==="
+        println "Project: ${project.name}"
+        println "Version: ${project.version}"
+        println "Java: ${java.sourceCompatibility}"
+        println ""
+        println "Build Intelligence caches:"
+        println "- Compiled classes (.gradle/caches)"
+        println "- Dependencies (~/.gradle/caches)"
+        println "- Incremental compilation state"
+        println "======================================"
+    }
+}
+
+// Make build depend on buildInfo for demo purposes
+build.dependsOn buildInfo

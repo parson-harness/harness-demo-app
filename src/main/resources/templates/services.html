@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${config.appName} + ' - Services'">My Application - Services</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'harness-dark': '#0D0D12',
+                        'harness-darker': '#08080B',
+                        'harness-blue': '#0278D5',
+                        'harness-cyan': '#00ADE4',
+                        'harness-purple': '#7B61FF',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #00D4FF 0%, #7B61FF 50%, #FF6B9D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .variant-badge { background-color: var(--variant-color); }
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3); }
+    </style>
+</head>
+<body class="bg-harness-dark min-h-screen text-white" th:style="'--variant-color: ' + ${config.variantColor}">
+    
+    <!-- Deployment Status Bar -->
+    <div class="variant-badge py-1.5 px-4 text-center text-sm font-medium">
+        <span class="inline-flex items-center space-x-3">
+            <span class="flex items-center">
+                <span class="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                <span th:text="${config.effectiveVariant.toUpperCase()}">STABLE</span>
+            </span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.displayVersion}">1.0.0</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.displayDeploymentTarget}">Amazon EKS</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.displayDeploymentStrategy}">Canary</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.namespace}">harness-demo</span>
+        </span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-harness-darker/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <img th:if="${config.customerLogo != ''}" th:src="${config.customerLogo}" alt="Logo" class="h-8">
+                    <img th:if="${config.customerLogo == ''}" src="/images/harness-logo.png" alt="Harness" class="h-8">
+                    <div class="hidden md:block text-left">
+                        <div class="text-sm font-semibold text-white" th:text="${config.appName}">Harness Demo Application</div>
+                        <div class="text-xs text-gray-400" th:text="${config.displayCustomerName}">Harness Customer</div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-8">
+                    <a href="/" class="text-gray-400 hover:text-white transition">Home</a>
+                    <a href="/services" class="text-white font-medium hover:text-harness-cyan transition">Services</a>
+                    <a href="/deployment" class="text-gray-400 hover:text-white transition">Deployment</a>
+                    <a href="/resilience" class="text-gray-400 hover:text-white transition">Resilience</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="py-16 border-b border-white/10">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h1 class="text-4xl font-bold mb-4">
+                <span class="gradient-text">Application Services</span>
+            </h1>
+            <p class="text-gray-400 max-w-2xl mx-auto">
+                Explore the capabilities powering <span th:text="${config.appName}">Harness Demo Application</span> for <span th:text="${config.displayCustomerName}">Harness Customer</span> on <span th:text="${config.displayDeploymentTarget}">Amazon EKS</span>
+            </p>
+        </div>
+    </section>
+
+    <!-- Services Grid -->
+    <section class="py-16">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                
+                <!-- API Service -->
+                <div class="bg-white/5 rounded-xl p-6 border border-white/10 card-hover">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-harness-cyan/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-code text-harness-cyan text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-lg">REST API</h3>
+                            <span class="text-xs text-green-400 flex items-center">
+                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></span> Healthy
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Core REST API endpoints for application data and health monitoring.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">Spring Boot</span>
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">Java 17</span>
+                    </div>
+                </div>
+
+                <!-- Metrics Service -->
+                <div class="bg-white/5 rounded-xl p-6 border border-white/10 card-hover">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-harness-purple/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-chart-line text-harness-purple text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-lg">Metrics</h3>
+                            <span class="text-xs text-green-400 flex items-center">
+                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></span> Healthy
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Prometheus metrics for monitoring, alerting, and Grafana dashboards.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">Micrometer</span>
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">Prometheus</span>
+                    </div>
+                </div>
+
+                <!-- Health Service -->
+                <div class="bg-white/5 rounded-xl p-6 border border-white/10 card-hover">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-heartbeat text-green-400 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-lg">Health Checks</h3>
+                            <span class="text-xs text-green-400 flex items-center">
+                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></span> Healthy
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Liveness and readiness probes for Kubernetes orchestration.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">Actuator</span>
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">K8s Probes</span>
+                    </div>
+                </div>
+
+                <!-- Web UI -->
+                <div class="bg-white/5 rounded-xl p-6 border border-white/10 card-hover">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-desktop text-blue-400 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-lg">Web Interface</h3>
+                            <span class="text-xs text-green-400 flex items-center">
+                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></span> Healthy
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Modern responsive UI with real-time deployment information.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">Thymeleaf</span>
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">TailwindCSS</span>
+                    </div>
+                </div>
+
+                <!-- Resilience -->
+                <div class="bg-white/5 rounded-xl p-6 border border-white/10 card-hover">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-orange-500/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-orange-400 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-lg">Resilience Testing</h3>
+                            <span class="text-xs text-green-400 flex items-center">
+                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></span> Ready
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Built-in chaos engineering hooks for resilience testing.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">Chaos Ready</span>
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">Fault Injection</span>
+                    </div>
+                </div>
+
+                <!-- Security -->
+                <div class="bg-white/5 rounded-xl p-6 border border-white/10 card-hover">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-lock text-red-400 text-xl"></i>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="font-semibold text-lg">Security</h3>
+                            <span class="text-xs text-green-400 flex items-center">
+                                <span class="w-1.5 h-1.5 bg-green-400 rounded-full mr-1"></span> Secured
+                            </span>
+                        </div>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Security scanning ready with OWASP and container scanning support.</p>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">OWASP</span>
+                        <span class="px-2 py-1 bg-white/10 rounded text-xs">Non-root</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6 text-center text-gray-500 text-sm">
+            <span th:text="${config.displayVersion}">1.0.0</span> &middot;
+            <span th:text="${config.environment}">production</span>
+        </div>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,79 @@
+# Default values for Harness demo app deployment
+# These can be overridden in Harness pipelines using service variables
+
+# Application metadata
+name: <+service.name.replace(" ", "").toLowerCase()>
+namespace: <+infra.namespace>
+replicas: 2
+containerPort: 8080
+
+# Image pull secret for private registries (HAR)
+dockercfg: <+artifact.imagePullSecret>
+
+# Harness-provided values
+image: <+artifact.image>
+service_identifier: <+service.identifier>
+env_identifier: <+env.identifier>
+build_id: <+pipeline.executionId>
+region: <+stage.variables.dynamic_config_region>
+
+# Application branding
+appName: <+pipeline.variables.application_display_name>
+appVersion: <+artifact.tag>
+customerName: <+pipeline.variables.customer_display_name>
+customerLogo: "https://developer.harness.io/img/logo_harness.svg"
+deploymentStrategy: ""
+servicePort: 80
+serviceType: ClusterIP
+
+# Deployment variant for blue/green or canary
+# Color is now computed dynamically based on harness.io/color label
+
+# Ingress configuration (set via Harness service variables by Terraform)
+ingressHost: <+serviceVariables.ingressHost>
+ingressStageHost: <+serviceVariables.ingressStageHost>
+publicUrl: https://<+serviceVariables.ingressHost>
+stageUrl: https://<+serviceVariables.ingressStageHost>
+certArn: <+serviceVariables.certArn>
+
+# Resource limits
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "250m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+# Chaos engineering configuration
+chaosEnabled: false
+chaosLatencyMs: 0
+chaosErrorRate: 0.0
+
+env:
+  config:
+    CONFIG_PROFILE: <+pipeline.variables.dynamic_config_profile>
+    CONFIG_BANNER: <+stage.variables.dynamic_config_banner>
+    CONFIG_TENANT: <+pipeline.variables.dynamic_config_tenant>
+    CONFIG_RELEASE_RING: <+stage.variables.dynamic_config_release_ring>
+    CONFIG_TARGET: <+infra.infraIdentifier>
+    CONFIG_SUPPORT_CONTACT: <+pipeline.variables.dynamic_config_support_contact>
+    CONFIG_VERSION: <+stage.variables.dynamic_config_version>
+    CONFIG_SOURCE: Harness Stage Variables
+    CONFIG_SECRET_PROVIDER: Separate Kubernetes Secret
+    REGION: <+stage.variables.dynamic_config_region>
+  secrets:
+    DYNAMIC_CONFIG_SECRET: <+stage.variables.dynamic_config_secret>
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 80
+  annotations: {}
+
+# ServiceMonitor configuration (for Prometheus)
+serviceMonitor:
+  enabled: true
+  toolsNamespace: tools
+  releaseLabel: monitoring
+  scrapeInterval: 15s

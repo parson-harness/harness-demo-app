@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${config.appName}">My Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'harness-dark': '#0D0D12',
+                        'harness-darker': '#08080B',
+                        'harness-blue': '#0278D5',
+                        'harness-cyan': '#00ADE4',
+                        'harness-purple': '#7B61FF',
+                        'harness-gradient-start': '#00D4FF',
+                        'harness-gradient-end': '#7B61FF',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .gradient-text {
+            background: linear-gradient(135deg, #00D4FF 0%, #7B61FF 50%, #FF6B9D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .gradient-border {
+            background: linear-gradient(135deg, #00D4FF, #7B61FF, #FF6B9D);
+            padding: 2px;
+            border-radius: 1rem;
+        }
+        .gradient-border-inner {
+            background: #0D0D12;
+            border-radius: calc(1rem - 2px);
+        }
+        .variant-badge {
+            background-color: var(--variant-color);
+        }
+        .variant-glow {
+            box-shadow: 0 0 30px color-mix(in srgb, var(--variant-color) 40%, transparent);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .hero-gradient {
+            background: radial-gradient(ellipse at top, rgba(123, 97, 255, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom right, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-harness-dark min-h-screen text-white" th:style="'--variant-color: ' + ${config.variantColor}">
+    
+    <!-- Deployment Status Bar -->
+    <div class="variant-badge py-1.5 px-4 text-center text-sm font-medium">
+        <span class="inline-flex items-center space-x-3">
+            <span class="flex items-center">
+                <span class="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></span>
+                <span th:text="${config.effectiveVariant.toUpperCase()}">STABLE</span>
+            </span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.displayVersion}">1.0.0</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.environment}">production</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.displayDeploymentTarget}">Amazon EKS</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.displayDeploymentStrategy}">Canary</span>
+            <span class="opacity-60">|</span>
+            <span th:text="${config.namespace}">harness-demo</span>
+        </span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="bg-harness-darker/80 backdrop-blur-md border-b border-white/10 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <img th:if="${config.customerLogo != ''}" th:src="${config.customerLogo}" alt="Logo" class="h-8">
+                    <img th:if="${config.customerLogo == ''}" src="/images/harness-logo.png" alt="Harness" class="h-8">
+                    <div class="hidden md:block text-left">
+                        <div class="text-sm font-semibold text-white" th:text="${config.appName}">Harness Demo Application</div>
+                        <div class="text-xs text-gray-400" th:text="${config.displayCustomerName}">Harness Customer</div>
+                    </div>
+                </div>
+                
+                <!-- Nav Links -->
+                <div class="flex items-center space-x-8">
+                    <a href="/" class="text-white font-medium hover:text-harness-cyan transition">Home</a>
+                    <a href="/services" class="text-gray-400 hover:text-white transition">Services</a>
+                    <a href="/deployment" class="text-gray-400 hover:text-white transition">Deployment</a>
+                    <a href="/resilience" class="text-gray-400 hover:text-white transition">Resilience</a>
+                    <a href="/api/health" class="px-4 py-2 bg-harness-blue hover:bg-harness-blue/80 rounded-lg font-medium transition">
+                        Health Check
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-gradient py-24">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                <span class="gradient-text" th:text="${config.appName}">Harness Demo Application</span>
+            </h1>
+            <p class="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
+                Live deployment experience for <span th:text="${config.displayCustomerName}">Harness Customer</span> running on <span th:text="${config.displayDeploymentTarget}">Amazon EKS</span> with <span th:text="${config.displayDeploymentStrategy}">Canary</span> delivery.
+            </p>
+            <div class="flex flex-wrap items-center justify-center gap-3 mb-8 text-sm">
+                <span class="px-3 py-1 bg-white/10 rounded-full" th:text="${config.displayCustomerName}">Harness Customer</span>
+                <span class="px-3 py-1 bg-white/10 rounded-full" th:text="${config.displayDeploymentTarget}">Amazon EKS</span>
+                <span class="px-3 py-1 bg-white/10 rounded-full" th:text="${config.displayDeploymentStrategy}">Canary</span>
+                <span class="px-3 py-1 bg-white/10 rounded-full">Build <span th:text="${config.displayBuildId}">n/a</span></span>
+            </div>
+            
+            <!-- Deployment Card -->
+            <div class="inline-block gradient-border float-animation">
+                <div class="gradient-border-inner px-8 py-6">
+                    <div class="text-sm text-gray-400 uppercase tracking-wider mb-2">Current Deployment</div>
+                    <div class="text-4xl font-bold mb-2 uppercase" th:style="'color: ' + ${config.variantColor}" th:text="${config.effectiveVariant}">stable</div>
+                    <div class="text-lg text-white/80 mb-3" th:text="${config.deploymentNarrative}">You are viewing the live production release</div>
+                    <div class="flex items-center justify-center space-x-4">
+                        <span class="variant-badge px-3 py-1 rounded-full text-sm font-medium" th:text="${config.displayVersion}">1.0.0</span>
+                        <span class="text-gray-500" th:text="${config.environment}">production</span>
+                        <span class="text-gray-500" th:text="${config.displayDeploymentTarget}">Amazon EKS</span>
+                        <span class="text-gray-500" th:text="${config.displayDeploymentStrategy}">Canary</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deployment Strategy Explainer -->
+    <section class="py-12 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="variant-glow rounded-2xl p-8 border-2" th:style="'border-color: ' + ${config.variantColor} + '40; background: linear-gradient(135deg, ' + ${config.variantColor} + '10 0%, transparent 50%)'">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div class="flex items-center gap-6">
+                        <!-- Large Color Indicator -->
+                        <div class="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl font-bold variant-badge">
+                            <span th:if="${config.effectiveVariant == 'blue'}">🔵</span>
+                            <span th:if="${config.effectiveVariant == 'green'}">🟢</span>
+                            <img th:if="${config.effectiveVariant == 'canary'}" src="/images/harness-canary.png" alt="Canary" class="w-12 h-12" />
+                            <span th:if="${config.effectiveVariant == 'stable'}">🟣</span>
+                        </div>
+                        <div>
+                            <div class="text-sm text-gray-400 uppercase tracking-wider mb-1" th:text="${config.effectiveVariant == 'blue' or config.effectiveVariant == 'green'} ? 'Harness Blue/Green Deployment' : 'Harness Canary Deployment'">Harness Deployment</div>
+                            <div class="text-3xl font-bold" th:style="'color: ' + ${config.variantColor}">
+                                <span th:if="${config.effectiveVariant == 'blue' or config.effectiveVariant == 'green'}">
+                                    <span th:text="${config.effectiveVariant.toUpperCase()}">BLUE</span> Pod Set
+                                </span>
+                                <span th:if="${config.effectiveVariant == 'canary'}">CANARY Release</span>
+                                <span th:if="${config.effectiveVariant == 'stable'}">STABLE Production</span>
+                            </div>
+                            <div class="text-gray-400 mt-2" th:if="${config.effectiveVariant == 'blue' or config.effectiveVariant == 'green'}">
+                                <i class="fas fa-info-circle mr-2"></i>Harness labels pods with <code class="bg-white/10 px-1.5 py-0.5 rounded text-xs">harness.io/color: <span th:text="${config.effectiveVariant}">blue</span></code>
+                            </div>
+                            <div class="text-gray-400 mt-2" th:if="${config.effectiveVariant == 'canary'}">
+                                <i class="fas fa-info-circle mr-2"></i>Harness labels pods with <code class="bg-white/10 px-1.5 py-0.5 rounded text-xs">harness.io/track: canary</code>
+                            </div>
+                            <div class="text-gray-400 mt-2" th:if="${config.effectiveVariant == 'stable'}">
+                                <i class="fas fa-info-circle mr-2"></i>Harness labels pods with <code class="bg-white/10 px-1.5 py-0.5 rounded text-xs">harness.io/track: stable</code>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-gray-400 mb-1">Version</div>
+                        <div class="text-2xl font-mono font-bold" th:text="${config.displayVersion}">1.0.0</div>
+                        <div class="text-sm text-gray-500 mt-2" th:text="${config.namespace}">namespace</div>
+                    </div>
+                </div>
+                
+                <!-- How It Works -->
+                <div class="mt-6 pt-6 border-t border-white/10">
+                    <div class="text-sm text-white font-semibold mb-3" th:text="${config.effectiveVariant == 'blue' or config.effectiveVariant == 'green'} ? 'How Harness Blue/Green Works:' : 'How Harness Canary Works:'">How It Works:</div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm" th:if="${config.effectiveVariant == 'blue' or config.effectiveVariant == 'green'}">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-harness-cyan font-semibold mb-1">1. Stage Deployment</div>
+                            <div class="text-gray-400">New version deploys to <strong>stage</strong> service. Production traffic unchanged.</div>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-harness-cyan font-semibold mb-1">2. Validate</div>
+                            <div class="text-gray-400">Test the staged version on the dedicated stage endpoint before approval.</div>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-harness-cyan font-semibold mb-1">3. Swap Primary</div>
+                            <div class="text-gray-400">Harness swaps service selectors. Instant traffic switch, instant rollback.</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm" th:if="${config.effectiveVariant == 'canary' or config.effectiveVariant == 'stable'}">
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-yellow-400 font-semibold mb-1">1. Canary Deploy</div>
+                            <div class="text-gray-400">New version deploys to canary pods receiving % of traffic.</div>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-yellow-400 font-semibold mb-1">2. Traffic Split</div>
+                            <div class="text-gray-400">Refresh page to see traffic split between canary and stable.</div>
+                        </div>
+                        <div class="bg-white/5 rounded-lg p-3">
+                            <div class="text-yellow-400 font-semibold mb-1">3. Promote or Rollback</div>
+                            <div class="text-gray-400">Gradually increase traffic or instantly rollback if issues found.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-6 border-t border-white/10">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-left">
+                        <a th:if="${config.publicUrl != null and !config.publicUrl.isEmpty()}" th:href="${config.publicUrl}" target="_blank" rel="noopener noreferrer" class="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-harness-cyan/50 transition block">
+                            <div class="text-sm text-gray-400 uppercase tracking-wider mb-1">Production URL</div>
+                            <div class="font-mono text-sm break-all" th:text="${config.publicUrl}">https://toddasg-asg.harness-demo.dev</div>
+                        </a>
+                        <a th:if="${config.stageUrl != null and !config.stageUrl.isEmpty() and config.effectiveDeploymentStrategy == 'blue-green'}" th:href="${config.stageUrl}" target="_blank" rel="noopener noreferrer" class="bg-white/5 rounded-lg p-4 border border-white/10 hover:border-harness-cyan/50 transition block">
+                            <div class="text-sm text-gray-400 uppercase tracking-wider mb-1">Stage URL</div>
+                            <div class="font-mono text-sm break-all" th:text="${config.stageUrl}">http://toddasg-asg.harness-demo.dev:8080</div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-16 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <!-- Environment -->
+                <div class="bg-white/5 rounded-xl p-6 card-hover border border-white/10">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-harness-blue/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-cloud text-harness-cyan"></i>
+                        </div>
+                        <span class="ml-3 text-gray-400">Environment</span>
+                    </div>
+                    <div class="text-2xl font-semibold" th:text="${config.environment}">production</div>
+                    <div class="text-sm text-gray-500 mt-1" th:text="${config.region}">us-east-1</div>
+                </div>
+
+                <!-- Instance -->
+                <div class="bg-white/5 rounded-xl p-6 card-hover border border-white/10">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-harness-purple/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-server text-harness-purple"></i>
+                        </div>
+                        <span class="ml-3 text-gray-400">Instance</span>
+                    </div>
+                    <div class="text-2xl font-semibold truncate" th:text="${hostname}">localhost</div>
+                    <div class="text-sm text-gray-500 mt-1" th:text="${config.namespace}">default</div>
+                </div>
+
+                <!-- Uptime -->
+                <div class="bg-white/5 rounded-xl p-6 card-hover border border-white/10">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-heartbeat text-green-400"></i>
+                        </div>
+                        <span class="ml-3 text-gray-400">Status</span>
+                    </div>
+                    <div class="text-2xl font-semibold text-green-400">Healthy</div>
+                    <div class="text-sm text-gray-500 mt-1">All systems operational</div>
+                </div>
+
+                <!-- Timestamp -->
+                <div class="bg-white/5 rounded-xl p-6 card-hover border border-white/10">
+                    <div class="flex items-center mb-4">
+                        <div class="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-clock text-orange-400"></i>
+                        </div>
+                        <span class="ml-3 text-gray-400">Server Time</span>
+                    </div>
+                    <div class="text-xl font-mono" th:text="${timestamp}">2024-01-01 12:00:00</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Section -->
+    <section class="py-16 bg-harness-darker">
+        <div class="max-w-7xl mx-auto px-6">
+            <h2 class="text-3xl font-bold text-center mb-12">
+                <span class="gradient-text">API Endpoints</span>
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <button onclick="testApi('/api/info')" class="bg-white/5 p-5 rounded-xl border border-white/10 hover:border-harness-cyan/50 transition text-left group">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-info-circle text-harness-cyan mr-2"></i>
+                        <span class="font-semibold group-hover:text-harness-cyan transition">/api/info</span>
+                    </div>
+                    <div class="text-sm text-gray-500">Application information</div>
+                </button>
+                <button onclick="testApi('/api/health')" class="bg-white/5 p-5 rounded-xl border border-white/10 hover:border-green-500/50 transition text-left group">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-heartbeat text-green-400 mr-2"></i>
+                        <span class="font-semibold group-hover:text-green-400 transition">/api/health</span>
+                    </div>
+                    <div class="text-sm text-gray-500">Health check endpoint</div>
+                </button>
+                <button onclick="testApi('/api/version')" class="bg-white/5 p-5 rounded-xl border border-white/10 hover:border-harness-purple/50 transition text-left group">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-tag text-harness-purple mr-2"></i>
+                        <span class="font-semibold group-hover:text-harness-purple transition">/api/version</span>
+                    </div>
+                    <div class="text-sm text-gray-500">Version details</div>
+                </button>
+                <button onclick="testApi('/actuator/prometheus')" class="bg-white/5 p-5 rounded-xl border border-white/10 hover:border-orange-500/50 transition text-left group">
+                    <div class="flex items-center mb-2">
+                        <i class="fas fa-chart-line text-orange-400 mr-2"></i>
+                        <span class="font-semibold group-hover:text-orange-400 transition">/metrics</span>
+                    </div>
+                    <div class="text-sm text-gray-500">Prometheus metrics</div>
+                </button>
+            </div>
+            
+            <!-- API Response -->
+            <div id="apiResponse" class="mt-8 hidden">
+                <div class="bg-black/50 rounded-xl p-6 border border-white/10">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-sm text-gray-400">Response</span>
+                        <button onclick="document.getElementById('apiResponse').classList.add('hidden')" class="text-gray-500 hover:text-white">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <pre id="apiResponseContent" class="text-green-400 text-sm font-mono overflow-x-auto"></pre>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-8 border-t border-white/10">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="flex items-center space-x-3 mb-4 md:mb-0">
+                    <img th:if="${config.customerLogo != ''}" th:src="${config.customerLogo}" alt="Logo" class="h-6 opacity-60">
+                    <img th:if="${config.customerLogo == ''}" src="/images/harness-logo.png" alt="Harness" class="h-6 opacity-60">
+                </div>
+                <div class="flex items-center space-x-6 text-sm text-gray-500">
+                    <span th:text="'Version ' + ${config.displayVersion}">Version 1.0.0</span>
+                    <span class="variant-badge px-2 py-0.5 rounded text-xs" th:text="${config.effectiveVariant}">stable</span>
+                    <span th:text="${config.environment}">production</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        async function testApi(endpoint) {
+            const responseDiv = document.getElementById('apiResponse');
+            const responseContent = document.getElementById('apiResponseContent');
+            
+            responseDiv.classList.remove('hidden');
+            responseContent.textContent = 'Loading...';
+            
+            try {
+                const response = await fetch(endpoint);
+                const contentType = response.headers.get('content-type');
+                
+                if (contentType && contentType.includes('application/json')) {
+                    const data = await response.json();
+                    responseContent.textContent = JSON.stringify(data, null, 2);
+                } else {
+                    const text = await response.text();
+                    responseContent.textContent = text.substring(0, 2000) + (text.length > 2000 ? '\n...(truncated)' : '');
+                }
+            } catch (error) {
+                responseContent.textContent = 'Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>

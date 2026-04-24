@@ -1,0 +1,55 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: ${APP_NAME:my-application}
+
+app:
+  app-name: ${APP_NAME:My Application}
+  version: ${APP_VERSION:1.0.0}
+  build-id: ${BUILD_ID:}
+  environment: ${APP_ENVIRONMENT:development}
+  deployment-variant: ${DEPLOYMENT_VARIANT:}
+  deployment-track: ${DEPLOYMENT_TRACK:}
+  deployment-strategy: ${DEPLOYMENT_STRATEGY:}
+  customer-name: ${CUSTOMER_NAME:Customer}
+  customer-logo: ${CUSTOMER_LOGO:}
+  deployment-target: ${DEPLOYMENT_TARGET:kubernetes}
+  public-url: ${PUBLIC_URL:}
+  stage-url: ${STAGE_URL:}
+  pod-name: ${HOSTNAME:local}
+  namespace: ${NAMESPACE:default}
+  region: ${REGION:us-east-1}
+  chaos-enabled: ${CHAOS_ENABLED:true}
+  chaos-latency-ms: ${CHAOS_LATENCY_MS:0}
+  chaos-error-rate: ${CHAOS_ERROR_RATE:0.0}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+  endpoint:
+    health:
+      show-details: always
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      environment: ${app.environment}
+      version: ${app.version}
+      variant: ${app.deployment-variant}
+      pod_name: ${app.pod-name}
+      namespace: ${app.namespace}
+      deployment_track: ${app.deployment-track}
+
+logging:
+  level:
+    io.harness.demo: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

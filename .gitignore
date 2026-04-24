@@ -1,0 +1,66 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+.vscode/
+*.swp
+*.swo
+.vscode/mcp.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Terraform / OpenTofu
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+terraform.tfvars
+*.auto.tfvars
+.terraformrc
+terraform.rc
+
+# Docker
+.docker/
+
+# Test output
+test-output/
+surefire-reports/
+tofu/bootstrap/dockercfg
+tofu/bootstrap/secret.yml
+tofu/bootstrap/temp_dockercfg
+.gradle/
+node_modules/
+playwright-report/
+test-results/
+
+# Java build output
+bin/
+build/
+*.class
