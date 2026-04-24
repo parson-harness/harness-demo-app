@@ -30,8 +30,9 @@ service:
             type: K8sManifest
             spec:
               store:
-                type: HarnessCode
+                type: Github
                 spec:
+                  connectorRef: parsongh
                   gitFetchType: Branch
                   paths:
                     - k8s/
