@@ -46,12 +46,73 @@ public class AppConfig {
     private String configSource = "Harness Pipeline";
     private String secretProvider = "Harness Secret Variable";
     private String dynamicSecret = "";
+    private transient boolean runtimeConfigEnabled = false;
+    private transient boolean runtimeConfigAvailable = false;
+    private transient boolean runtimeConfigOverridesActive = false;
+    private transient String runtimeConfigStatus = "deployment-only";
+    private transient String runtimeConfigTreatment = "not-evaluated";
+    private transient String runtimeConfigFlag = "";
+    private transient String runtimeConfigTargetKey = "";
+    private transient String runtimeConfigResolvedBy = "Harness Pipeline";
+    private transient String runtimeConfigLayering = "application defaults -> deployment config";
+    private transient String runtimeConfigRestartRequirement = "Deployment-time config changes require rollout";
+    private transient String runtimeConfigRollbackStrategy = "Pipeline rollback";
+    private transient String runtimeConfigSecretHandling = "Secrets stay in Kubernetes Secret";
+    private transient String runtimeConfigAuditTrail = "Harness Pipeline execution history";
+    private transient String runtimeConfigError = "";
     private boolean chaosEnabled = true;
     private int chaosLatencyMs = 0;
     private double chaosErrorRate = 0.0;
     private transient volatile boolean asgDeploymentTrackResolved = false;
     private transient String inferredAsgDeploymentTrack = "";
-    
+
+    public AppConfig copy() {
+        AppConfig copy = new AppConfig();
+        copy.setAppName(appName);
+        copy.setVersion(version);
+        copy.setBuildId(buildId);
+        copy.setEnvironment(environment);
+        copy.setDeploymentVariant(deploymentVariant);
+        copy.setDeploymentTrack(deploymentTrack);
+        copy.setDeploymentStrategy(deploymentStrategy);
+        copy.setCustomerName(customerName);
+        copy.setCustomerLogo(customerLogo);
+        copy.setDeploymentTarget(deploymentTarget);
+        copy.setPublicUrl(publicUrl);
+        copy.setStageUrl(stageUrl);
+        copy.setPodName(podName);
+        copy.setNamespace(namespace);
+        copy.setRegion(region);
+        copy.setConfigProfile(configProfile);
+        copy.setConfigBanner(configBanner);
+        copy.setConfigTenant(configTenant);
+        copy.setConfigReleaseRing(configReleaseRing);
+        copy.setConfigTarget(configTarget);
+        copy.setConfigSupportContact(configSupportContact);
+        copy.setConfigVersion(configVersion);
+        copy.setConfigSource(configSource);
+        copy.setSecretProvider(secretProvider);
+        copy.setDynamicSecret(dynamicSecret);
+        copy.setRuntimeConfigEnabled(runtimeConfigEnabled);
+        copy.setRuntimeConfigAvailable(runtimeConfigAvailable);
+        copy.setRuntimeConfigOverridesActive(runtimeConfigOverridesActive);
+        copy.setRuntimeConfigStatus(runtimeConfigStatus);
+        copy.setRuntimeConfigTreatment(runtimeConfigTreatment);
+        copy.setRuntimeConfigFlag(runtimeConfigFlag);
+        copy.setRuntimeConfigTargetKey(runtimeConfigTargetKey);
+        copy.setRuntimeConfigResolvedBy(runtimeConfigResolvedBy);
+        copy.setRuntimeConfigLayering(runtimeConfigLayering);
+        copy.setRuntimeConfigRestartRequirement(runtimeConfigRestartRequirement);
+        copy.setRuntimeConfigRollbackStrategy(runtimeConfigRollbackStrategy);
+        copy.setRuntimeConfigSecretHandling(runtimeConfigSecretHandling);
+        copy.setRuntimeConfigAuditTrail(runtimeConfigAuditTrail);
+        copy.setRuntimeConfigError(runtimeConfigError);
+        copy.setChaosEnabled(chaosEnabled);
+        copy.setChaosLatencyMs(chaosLatencyMs);
+        copy.setChaosErrorRate(chaosErrorRate);
+        return copy;
+    }
+
     /**
      * Returns the effective deployment variant for display.
      * Blue/Green deployments use harness.io/color label (blue/green).

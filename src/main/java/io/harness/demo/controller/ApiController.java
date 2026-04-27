@@ -3,6 +3,7 @@ package io.harness.demo.controller;
 import io.harness.demo.config.AppConfig;
 import io.harness.demo.service.ChaosService;
 import io.harness.demo.service.MetricsService;
+import io.harness.demo.service.RuntimeConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,15 +19,16 @@ import java.util.Random;
 @RequiredArgsConstructor
 public class ApiController {
 
-    private final AppConfig appConfig;
     private final MetricsService metricsService;
     private final ChaosService chaosService;
+    private final RuntimeConfigService runtimeConfigService;
     private final Random random = new Random();
 
     @GetMapping("/info")
     public ResponseEntity<Map<String, Object>> getInfo() {
         metricsService.incrementApiCalls("info");
         chaosService.maybeInjectChaos();
+        AppConfig appConfig = runtimeConfigService.resolveConfig();
         
         Map<String, Object> info = new HashMap<>();
         Map<String, Object> dynamicConfig = new HashMap<>();
@@ -70,8 +72,22 @@ public class ApiController {
         dynamicConfig.put("source", appConfig.getDisplayConfigSource());
         dynamicConfig.put("secretProvider", appConfig.getDisplaySecretProvider());
         dynamicConfig.put("secretConfigured", appConfig.isDynamicSecretConfigured());
+        dynamicConfig.put("runtimeEnabled", appConfig.isRuntimeConfigEnabled());
+        dynamicConfig.put("runtimeAvailable", appConfig.isRuntimeConfigAvailable());
+        dynamicConfig.put("runtimeOverridesActive", appConfig.isRuntimeConfigOverridesActive());
+        dynamicConfig.put("runtimeStatus", appConfig.getRuntimeConfigStatus());
+        dynamicConfig.put("runtimeTreatment", appConfig.getRuntimeConfigTreatment());
+        dynamicConfig.put("runtimeFlag", appConfig.getRuntimeConfigFlag());
+        dynamicConfig.put("runtimeTargetKey", appConfig.getRuntimeConfigTargetKey());
+        dynamicConfig.put("runtimeResolvedBy", appConfig.getRuntimeConfigResolvedBy());
+        dynamicConfig.put("restartRequirement", appConfig.getRuntimeConfigRestartRequirement());
+        dynamicConfig.put("rollbackStrategy", appConfig.getRuntimeConfigRollbackStrategy());
+        dynamicConfig.put("auditTrail", appConfig.getRuntimeConfigAuditTrail());
+        dynamicConfig.put("error", appConfig.getRuntimeConfigError());
         dynamicConfig.put("artifactPromotionModel", "same-artifact-different-config");
-        dynamicConfig.put("injectionModel", "deployment-time-config-injection");
+        dynamicConfig.put("injectionModel", appConfig.isRuntimeConfigOverridesActive() ? "deployment-time-config-injection + runtime-fme-overrides" : "deployment-time-config-injection");
+        dynamicConfig.put("layering", appConfig.getRuntimeConfigLayering());
+        dynamicConfig.put("secretHandling", appConfig.getRuntimeConfigSecretHandling());
         info.put("dynamicConfig", dynamicConfig);
         info.put("timestamp", Instant.now().toString());
         info.put("javaVersion", System.getProperty("java.version"));
@@ -82,6 +98,7 @@ public class ApiController {
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
         metricsService.incrementApiCalls("health");
+        AppConfig appConfig = resolvedConfig();
         
         Map<String, Object> health = new HashMap<>();
         health.put("status", "UP");
@@ -96,6 +113,7 @@ public class ApiController {
     @GetMapping("/version")
     public ResponseEntity<Map<String, String>> version() {
         metricsService.incrementApiCalls("version");
+        AppConfig appConfig = resolvedConfig();
         
         Map<String, String> version = new HashMap<>();
         version.put("version", appConfig.getDisplayVersion());
@@ -111,6 +129,7 @@ public class ApiController {
         metricsService.incrementApiCalls("process");
         metricsService.recordProcessingTime(random.nextInt(100) + 50);
         chaosService.maybeInjectChaos();
+        AppConfig appConfig = resolvedConfig();
         
         Map<String, Object> response = new HashMap<>();
         response.put("status", "processed");
@@ -127,6 +146,7 @@ public class ApiController {
             @RequestParam(defaultValue = "100") int durationMs) {
         
         metricsService.incrementApiCalls("simulate-load");
+        AppConfig appConfig = resolvedConfig();
         
         long start = System.currentTimeMillis();
         
@@ -184,6 +204,7 @@ public class ApiController {
             @RequestParam(defaultValue = "60") int durationSeconds) {
         
         metricsService.incrementChaosEvents("enable");
+        AppConfig appConfig = resolvedConfig();
         
         // Store chaos config - this will affect all subsequent requests
         chaosService.enableChaos(latencyMs, errorRate, durationSeconds);
@@ -203,6 +224,7 @@ public class ApiController {
     public ResponseEntity<Map<String, Object>> disableChaos() {
         metricsService.incrementChaosEvents("disable");
         chaosService.disableChaos();
+        AppConfig appConfig = resolvedConfig();
         
         Map<String, Object> response = new HashMap<>();
         response.put("status", "chaos_disabled");
@@ -214,6 +236,7 @@ public class ApiController {
 
     @GetMapping("/chaos/status")
     public ResponseEntity<Map<String, Object>> chaosStatus() {
+        AppConfig appConfig = resolvedConfig();
         Map<String, Object> response = new HashMap<>();
         response.put("enabled", chaosService.isChaosActive());
         response.put("latencyMs", chaosService.getCurrentLatency());
@@ -227,6 +250,7 @@ public class ApiController {
     @PostMapping("/chaos/degrade-canary")
     public ResponseEntity<Map<String, Object>> degradeCanary(
             @RequestParam(defaultValue = "60") int durationSeconds) {
+        AppConfig appConfig = resolvedConfig();
         
         // Only degrade if this is a canary deployment
         if (!"canary".equalsIgnoreCase(appConfig.getEffectiveVariant())) {
@@ -256,6 +280,10 @@ public class ApiController {
         response.put("message", "Canary deployment degraded - CV should detect and trigger rollback");
         
         return ResponseEntity.ok(response);
+    }
+
+    private AppConfig resolvedConfig() {
+        return runtimeConfigService.resolveConfig();
     }
 
     private String getHostname() {

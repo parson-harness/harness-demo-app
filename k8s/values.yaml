@@ -61,9 +61,12 @@ env:
     CONFIG_VERSION: <+stage.variables.dynamic_config_version>
     CONFIG_SOURCE: Harness Stage Variables
     CONFIG_SECRET_PROVIDER: Separate Kubernetes Secret
+    FME_ENABLED: <+serviceVariables.fmeEnabled>
+    FME_FLAG_NAME: <+serviceVariables.fmeFlagName>
     REGION: <+stage.variables.dynamic_config_region>
   secrets:
     DYNAMIC_CONFIG_SECRET: <+stage.variables.dynamic_config_secret>
+    FME_SDK_KEY: <+serviceVariables.fmeSdkKey>
 
 # Service configuration
 service:

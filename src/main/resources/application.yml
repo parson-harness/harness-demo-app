@@ -21,9 +21,24 @@ app:
   pod-name: ${HOSTNAME:local}
   namespace: ${NAMESPACE:default}
   region: ${REGION:us-east-1}
+  config-profile: ${CONFIG_PROFILE:shared-base}
+  config-banner: ${CONFIG_BANNER:}
+  config-tenant: ${CONFIG_TENANT:default}
+  config-release-ring: ${CONFIG_RELEASE_RING:default}
+  config-target: ${CONFIG_TARGET:default-target}
+  config-support-contact: ${CONFIG_SUPPORT_CONTACT:support@harness.io}
+  config-version: ${CONFIG_VERSION:}
+  config-source: ${CONFIG_SOURCE:Harness Pipeline}
+  secret-provider: ${CONFIG_SECRET_PROVIDER:Harness Secret Variable}
+  dynamic-secret: ${DYNAMIC_CONFIG_SECRET:}
   chaos-enabled: ${CHAOS_ENABLED:true}
   chaos-latency-ms: ${CHAOS_LATENCY_MS:0}
   chaos-error-rate: ${CHAOS_ERROR_RATE:0.0}
+
+fme:
+  enabled: ${FME_ENABLED:false}
+  sdk-key: ${FME_SDK_KEY:}
+  flag-name: ${FME_FLAG_NAME:runtime_experience_config}
 
 management:
   endpoints:

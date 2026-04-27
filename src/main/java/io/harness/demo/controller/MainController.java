@@ -1,7 +1,7 @@
 package io.harness.demo.controller;
 
-import io.harness.demo.config.AppConfig;
 import io.harness.demo.service.MetricsService;
+import io.harness.demo.service.RuntimeConfigService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,8 +16,8 @@ import java.time.format.DateTimeFormatter;
 @RequiredArgsConstructor
 public class MainController {
 
-    private final AppConfig appConfig;
     private final MetricsService metricsService;
+    private final RuntimeConfigService runtimeConfigService;
 
     @GetMapping("/")
     public String home(Model model, 
@@ -25,12 +25,13 @@ public class MainController {
                        @RequestParam(required = false) String company) {
         
         metricsService.incrementPageViews("home");
+        io.harness.demo.config.AppConfig resolvedConfig = runtimeConfigService.resolveConfig();
         
         String hostname = getHostname();
-        String displayName = name != null ? name : appConfig.getCustomerName();
+        String displayName = name != null ? name : resolvedConfig.getCustomerName();
         String displayCompany = company != null ? company : "Harness";
         
-        model.addAttribute("config", appConfig);
+        model.addAttribute("config", resolvedConfig);
         model.addAttribute("hostname", hostname);
         model.addAttribute("userName", displayName);
         model.addAttribute("company", displayCompany);
@@ -43,14 +44,14 @@ public class MainController {
     @GetMapping("/services")
     public String services(Model model) {
         metricsService.incrementPageViews("services");
-        model.addAttribute("config", appConfig);
+        model.addAttribute("config", runtimeConfigService.resolveConfig());
         return "services";
     }
 
     @GetMapping("/deployment")
     public String deployment(Model model) {
         metricsService.incrementPageViews("deployment");
-        model.addAttribute("config", appConfig);
+        model.addAttribute("config", runtimeConfigService.resolveConfig());
         model.addAttribute("hostname", getHostname());
         return "deployment";
     }
@@ -58,7 +59,7 @@ public class MainController {
     @GetMapping("/resilience")
     public String resilience(Model model) {
         metricsService.incrementPageViews("resilience");
-        model.addAttribute("config", appConfig);
+        model.addAttribute("config", runtimeConfigService.resolveConfig());
         return "resilience";
     }
 

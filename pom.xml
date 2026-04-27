@@ -45,6 +45,12 @@
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>io.split.client</groupId>
+            <artifactId>java-client</artifactId>
+            <version>4.18.3</version>
+        </dependency>
         
         <!-- Validation -->
         <dependency>
